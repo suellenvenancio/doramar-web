@@ -2,7 +2,6 @@ import { jwtDecode } from "jwt-decode"
 import { type NextRequest, NextResponse } from "next/server"
 
 const publicRoutes = [
-  { path: "/", whenAuthenticated: "next" },
   { path: "/login", whenAuthenticated: "redirect" },
   { path: "/create-account", whenAuthenticated: "redirect" },
   { path: "/forgot-password", whenAuthenticated: "next" },
