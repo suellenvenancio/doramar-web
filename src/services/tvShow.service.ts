@@ -38,7 +38,6 @@ export const tvShowService = {
   },
 
   async findFavoriteTvShowByUserId(userId: string): Promise<TvShow> {
-    console.log(userId, "****")
     return await apiClient.get(`/tvShows/favorite/user/${userId}`)
   },
 
@@ -49,5 +48,12 @@ export const tvShowService = {
     return await apiClient.post(`/tvShows/user/${userId}/favoriteTvShow`, {
       tvShowId,
     })
+  },
+
+  async removeTvShowFromWatched(
+    userId: string,
+    tvShowId: string,
+  ): Promise<void> {
+    return apiClient.delete(`/tvShows/user/${userId}/watched/${tvShowId}`)
   },
 }

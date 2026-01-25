@@ -18,17 +18,33 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { useParams } from "next/navigation"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 
 import { IconButton } from "@/components/button/iconButton"
+import { EyeIcon } from "@/components/icons/eye"
 import { MenuIcon } from "@/components/icons/menu"
 import { TrashIcon } from "@/components/icons/trash"
 import { Layout } from "@/components/layout"
 import { useList } from "@/hooks/use-list"
+import { useTvShow } from "@/hooks/use-tv-shows"
 import type { TvShow } from "@/types"
 
 export default function ListsDetailsPage() {
   const { lists, removeTvShowFromTheList, updateListOrder } = useList()
+  const { watchedTvShows, markTvShowAsWatched, removeTvShowFromWatched } =
+    useTvShow()
+
+  const wasWatched = useCallback(
+    (tvShowId: string) => {
+      return (
+        watchedTvShows?.some(
+          (watchedTvShow) => watchedTvShow.id === tvShowId,
+        ) ?? false
+      )
+    },
+    [watchedTvShows],
+  )
+
   const params = useParams()
   const listId = params.listId as string
 
@@ -74,7 +90,6 @@ export default function ListsDetailsPage() {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   )
-
   return (
     <Layout page="Lists">
       {listTvShows && listTvShows?.length > 0 ? (
@@ -89,14 +104,23 @@ export default function ListsDetailsPage() {
               strategy={verticalListSortingStrategy}
             >
               {items
-                ? items?.map((tvShow) => (
-                    <ListItem
-                      key={tvShow.id}
-                      tvShow={tvShow}
-                      onRemoveTvShow={removeTvShow}
-                      listId={listId!}
-                    />
-                  ))
+                ? items?.map((tvShow) => {
+                    const tvShowWasWatched = wasWatched(tvShow.id)
+                    const handleWithWatchStatus = tvShowWasWatched
+                      ? removeTvShowFromWatched
+                      : markTvShowAsWatched
+
+                    return (
+                      <ListItem
+                        key={tvShow.id}
+                        tvShow={tvShow}
+                        onRemoveTvShow={removeTvShow}
+                        listId={listId!}
+                        wasWatched={tvShowWasWatched}
+                        handleWithWatchStatus={handleWithWatchStatus}
+                      />
+                    )
+                  })
                 : null}
             </SortableContext>
           </DndContext>
@@ -119,8 +143,16 @@ interface ListItemProps {
   tvShow: TvShow
   onRemoveTvShow: (tvShow: TvShow, listId: string) => void
   listId: string
+  wasWatched: boolean
+  handleWithWatchStatus: (tvShow: TvShow, watchedStatusId: string) => void
 }
-function ListItem({ tvShow, onRemoveTvShow, listId }: ListItemProps) {
+function ListItem({
+  tvShow,
+  onRemoveTvShow,
+  listId,
+  wasWatched,
+  handleWithWatchStatus,
+}: ListItemProps) {
   const {
     attributes,
     listeners,
@@ -150,7 +182,7 @@ function ListItem({ tvShow, onRemoveTvShow, listId }: ListItemProps) {
             {...listeners}
             style={{ touchAction: "none" }}
           >
-            <MenuIcon />
+            <MenuIcon data-testid="menu-icon" />
           </span>
 
           <div className="flex flex-col gap-1">
@@ -159,10 +191,26 @@ function ListItem({ tvShow, onRemoveTvShow, listId }: ListItemProps) {
             </p>
           </div>
         </div>
-        <IconButton
-          icon={<TrashIcon className="text-[#C2185B]" />}
-          onClick={() => onRemoveTvShow(tvShow, listId)}
-        />
+        <div className="flex items-center gap-4">
+          <IconButton
+            data-testid="eye-button"
+            icon={<EyeIcon />}
+            onClick={() => {
+              if (wasWatched) {
+                return handleWithWatchStatus(tvShow, "1")
+              }
+              handleWithWatchStatus(tvShow, "3")
+            }}
+            className={`transition-colors hover:scale-110 mt-1.5 ${
+              !wasWatched ? "text-gray-400" : "text-green-500"
+            }`}
+          />
+          <IconButton
+            data-testid="trash-button"
+            icon={<TrashIcon className="text-[#C2185B]" />}
+            onClick={() => onRemoveTvShow(tvShow, listId)}
+          />
+        </div>
       </div>
     </div>
   )

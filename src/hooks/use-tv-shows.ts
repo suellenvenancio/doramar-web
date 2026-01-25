@@ -136,6 +136,20 @@ export function useTvShow() {
     [user, setFavoriteTvShow],
   )
 
+  const removeTvShowFromWatched = async (tvShow: TvShow) => {
+    if (!userId) {
+      toast("Erro ao remover dos assistidos!")
+      return
+    }
+    try {
+      await tvShowService.removeTvShowFromWatched(userId, tvShow.id)
+      setWatchedTvShows((prev) =>
+        prev.filter((watched) => watched.id !== tvShow.id),
+      )
+    } catch (e) {
+      console.error(`Erro ao remover ${tvShow.title} dos assistidos: ${e}`)
+    }
+  }
   return {
     tvShows,
     watchedStatus,
@@ -148,5 +162,6 @@ export function useTvShow() {
     findFavoriteTvShowByUserId,
     favoriteTvShow,
     markTvShowAsFavorite,
+    removeTvShowFromWatched,
   }
 }
