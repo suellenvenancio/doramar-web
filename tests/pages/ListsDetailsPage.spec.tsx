@@ -109,10 +109,10 @@ describe("ListsDetailsPage", () => {
       ...defaultUseTvShow,
       watchedTvShows: [{
         id: "dorama-1",
-        title: "Pousando no Amor",
+          title: "Pousando no Amor",
       }],
     })
-    
+
     const { getByTestId } = render(<ListsDetailsPage />)
     const trashIcon = getByTestId("eye-button")
     fireEvent.click(trashIcon)
