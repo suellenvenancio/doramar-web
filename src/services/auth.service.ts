@@ -32,7 +32,7 @@ export class AuthService {
   }
 
   async signOut(): Promise<void> {
-    return signOut(this.firebaseAuth)
+    return await signOut(this.firebaseAuth)
   }
 
   resetPassword(email: string): Promise<void> {

@@ -1,7 +1,8 @@
 import { useCallback, useContext } from "react"
+
+import { toast } from "@/components/toast"
 import { AuthContext } from "@/context/auth.context"
 import { userService } from "@/services/user.service"
-import { toast } from "@/components/toast"
 
 export function useAuthContext() {
   const context = useContext(AuthContext)

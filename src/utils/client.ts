@@ -21,7 +21,7 @@ export class AxiosWrapper {
     })
 
     this.instance.interceptors.request.use(async (config) => {
-      let token = await this.getValidToken()
+      const token = await this.getValidToken()
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`

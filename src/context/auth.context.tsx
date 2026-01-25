@@ -58,12 +58,14 @@ export function AuthProvider({ children }: IProviderData) {
           .then(async (userCredential) => {
             const userData = await userService.findUserByEmail(email)
 
+            console.log(userData)
             const token = await userCredential.user.getIdToken()
             Cookies.set("appToken", token, { expires: 7 })
             setUser(userData)
           })
         return user
       } catch (error) {
+        Cookies.remove("appToken")
         console.error(`Erro ao efetuar login: ${error}`)
         setUser(null)
         throw new Error("Error on get the user")
