@@ -12,13 +12,13 @@ const __dirname = path.dirname(__filename)
 
 export default tseslint.config(
   {
-    ignores: [".next", "dist", "node_modules"],
+    ignores: [".next", "dist", "node_modules", "jest.config"],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
 
   {
-    files: ["**/*.{ts,tsx,jsx}"],
+    files: ["**/*.{ts,tsx}"],
     plugins: {
       "react-hooks": reactHooks,
       "@next/next": nextPlugin,
