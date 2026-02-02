@@ -1,5 +1,5 @@
 "use client"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { useGenres } from "@//hooks/use-genres"
 import { CircleIcon } from "@/components/icons/circle"
@@ -139,7 +139,6 @@ export default function HomePage() {
   const onPageChange = useCallback(
     async (newPage: number) => {
       await fetchTvShowsByPage(newPage, 20)
-      window.scrollTo({ top: 0, behavior: "smooth" })
     },
     [fetchTvShowsByPage],
   )
@@ -150,6 +149,16 @@ export default function HomePage() {
     },
     [favoriteTvShow],
   )
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!scrollRef.current) return
+
+    requestAnimationFrame(() => {
+      scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })
+    })
+  }, [currentPage])
 
   return (
     <Layout
@@ -165,7 +174,10 @@ export default function HomePage() {
         page: "Home",
       }}
     >
-      <div className="w-full mt-6 flex flex-col md:flex-row md:flex-wrap md:items-start md:justify-evenly p-6">
+      <div
+        className="w-full mt-6 flex flex-col md:flex-row md:flex-wrap md:items-start md:justify-evenly p-6 h-[calc(100vh-200px)] overflow-y-auto"
+        ref={scrollRef}
+      >
         {isLoadingTvShowsByPage ? (
           <div className="flex flex-col items-center justify-center w-full py-24">
             <CircleIcon className="h-12 w-12 text-pink-600" />

@@ -32,7 +32,7 @@ export function Layout({
   return (
     <div
       className={mergeCn(
-        `w-full flex flex-col justify-between items-center relative h-screen overflow-y-auto`,
+        `w-full flex flex-col justify-between items-center relative`,
         className,
       )}
     >
