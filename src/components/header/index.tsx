@@ -44,8 +44,8 @@ export function Header({
   }
 
   return (
-    <header className="sticky top-0 z-50 flex bg-[#FEB5D0] p-2 w-full">
-      <Image className="h-12 w-25 md:w-36" src={doramar} alt="logo" />
+    <header className="sticky top-0 z-50 flex bg-[#FEB5D0] p-2 w-full justify-between">
+      <Image className="h-12 w-24 md:w-36" src={doramar} alt="logo" />
 
       {page === "Home" && (
         <div className="flex items-center w-full col-span-2 md:ml-12">
