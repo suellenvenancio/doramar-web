@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 "use client"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 
 import { useGenres } from "@//hooks/use-genres"
 import { CircleIcon } from "@/components/icons/circle"
@@ -148,18 +149,8 @@ export default function HomePage() {
       return favoriteTvShow?.id === tvShowId
     },
     [favoriteTvShow],
-  )
-
-  const scrollRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!scrollRef.current) return
-
-    requestAnimationFrame(() => {
-      scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })
-    })
-  }, [currentPage])
-
+  ) 
+  
   return (
     <Layout
       page="Home"
@@ -173,11 +164,10 @@ export default function HomePage() {
         setActivePopUp: onActivePopUp,
         page: "Home",
       }}
+      currentPage={currentPage}
     >
       <div
-        className="w-full mt-6 flex flex-col md:flex-row md:flex-wrap md:items-start md:justify-evenly p-6 h-[calc(100vh-200px)] overflow-y-auto"
-        ref={scrollRef}
-      >
+        className="w-full mt-6 flex flex-col md:flex-row md:flex-wrap md:items-start md:justify-evenly p-6">
         {isLoadingTvShowsByPage ? (
           <div className="flex flex-col items-center justify-center w-full py-24">
             <CircleIcon className="h-12 w-12 text-pink-600" />

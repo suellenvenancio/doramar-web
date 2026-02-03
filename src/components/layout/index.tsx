@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useRef } from "react"
 
 import { ButtonTypeEnum, type Genre, type Page } from "@/types"
 import { mergeCn } from "@/utils/cn"
@@ -21,6 +21,7 @@ interface LayoutProps {
     setActivePopUp: () => void
     page: Page
   }
+  currentPage?: number
 }
 
 export function Layout({
@@ -28,7 +29,18 @@ export function Layout({
   className,
   headerProps,
   page,
+  currentPage,
 }: LayoutProps) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!scrollRef.current) return
+
+    requestAnimationFrame(() => {
+      scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })
+    })
+  }, [currentPage])
+
   return (
     <div
       className={mergeCn(
@@ -39,7 +51,9 @@ export function Layout({
       <Header {...{ page, ...(headerProps && headerProps) }} />
       <div className="flex md:flex-row w-full md:items-start items-center mt-4">
         <SideBar />
-        <main className="mb-12 w-full">{children}</main>
+        <main className="mb-12 w-full overflow-y-auto h-screen" ref={scrollRef}>
+          {children}
+        </main>
       </div>
       <MobileFooterMenu />
     </div>
