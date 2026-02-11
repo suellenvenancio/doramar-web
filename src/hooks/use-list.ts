@@ -12,16 +12,10 @@ export function useList() {
 
   const userId = user?.id
 
-  const { data, mutate, isLoading } = useSWR<ListWithTvShows[]>(
-    "lists",
-    () => {
-      if (!userId) return []
-      return listService.getListsByUserId(userId)
-    },
-    {
-      suspense: true,
-    },
-  )
+  const { data, mutate, isLoading } = useSWR<ListWithTvShows[]>("lists", () => {
+    if (!userId) return []
+    return listService.getListsByUserId(userId)
+  })
 
   const addTvShowToList = useCallback(
     async (list: List, tvShow: TvShow) => {

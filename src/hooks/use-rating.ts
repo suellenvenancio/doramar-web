@@ -12,16 +12,10 @@ export function useRating() {
 
   const userId = user?.id
 
-  const { data, mutate } = useSWR<RatingWithTvShow[]>(
-    "ratings",
-    () => {
-      if (!userId) return []
-      return ratingService.getRatingsByUserId(userId)
-    },
-    {
-      suspense: true,
-    },
-  )
+  const { data, mutate } = useSWR<RatingWithTvShow[]>("ratings", () => {
+    if (!userId) return []
+    return ratingService.getRatingsByUserId(userId)
+  })
 
   const createRating = useCallback(
     async (tvShowId: string, scaleId: number) => {

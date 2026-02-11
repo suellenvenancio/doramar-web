@@ -20,12 +20,8 @@ export function useActor() {
     }
   }, [])
 
-  const { data, mutate } = useSWR<Actor[]>(
-    "actors",
-    () => findFavoriteActorsByUserId(userId ?? ""),
-    {
-      suspense: true,
-    },
+  const { data, mutate } = useSWR<Actor[]>("actors", () =>
+    findFavoriteActorsByUserId(userId ?? ""),
   )
 
   const markActorAsFavorite = useCallback(

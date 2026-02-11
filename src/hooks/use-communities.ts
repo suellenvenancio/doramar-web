@@ -10,12 +10,8 @@ export function useCommunities() {
   const { user } = useUser()
   const userId = user?.id
 
-  const { data, mutate, isLoading } = useSWR<Community[]>(
-    "communities",
-    () => communitiesService.getAllCommunities(),
-    {
-      suspense: true,
-    },
+  const { data, mutate, isLoading } = useSWR<Community[]>("communities", () =>
+    communitiesService.getAllCommunities(),
   )
 
   const createCommunity = async ({
