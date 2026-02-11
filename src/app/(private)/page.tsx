@@ -50,7 +50,7 @@ export default function HomePage() {
 
     const searchQuery = search.trim().toLowerCase()
     if (searchQuery) {
-      results = tvShows.filter((show) =>
+      results = tvShows?.filter((show) =>
         show.title.toLowerCase().includes(searchQuery),
       )
     }
@@ -137,20 +137,17 @@ export default function HomePage() {
     )
   }, [])
 
-  const onPageChange = useCallback(
-    async (newPage: number) => {
-      await fetchTvShowsByPage(newPage, 20)
-    },
-    [fetchTvShowsByPage],
-  )
+  const onPageChange = (newPage: number) => {
+    fetchTvShowsByPage(newPage)
+  }
 
   const checkTheFavoriteTvShow = useCallback(
     (tvShowId: string) => {
       return favoriteTvShow?.id === tvShowId
     },
     [favoriteTvShow],
-  ) 
-  
+  )
+
   return (
     <Layout
       page="Home"
@@ -208,7 +205,7 @@ export default function HomePage() {
           </div>
         )}
       </div>
-      {tvShowsToRender.length > 0 && (
+      {tvShowsToRender.length > 0 && tvShowsToRender.length === 20 && (
         <Pagination
           currentPage={currentPage ?? 1}
           totalPages={totalPages ?? 0}

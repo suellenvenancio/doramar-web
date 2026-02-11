@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import useSWR from "swr"
 
 import { toast } from "@/components/toast"
 import { communitiesService } from "@/services/communities.service"
@@ -7,25 +7,16 @@ import type { Community, ReactionTargetType, ReactionType } from "@/types"
 import { useUser } from "./use-user"
 
 export function useCommunities() {
-  const [communities, setCommunities] = useState<Community[]>([])
-  const [isLoading, setIsLoading] = useState(false)
   const { user } = useUser()
   const userId = user?.id
 
-  useEffect(() => {
-    const fetchCommunities = async () => {
-      try {
-        setIsLoading(true)
-        const fetchedCommunities = await communitiesService.getAllCommunities()
-        setCommunities(fetchedCommunities)
-      } catch (error) {
-        console.error("Failed to fetch communities:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    fetchCommunities()
-  }, [])
+  const { data, mutate, isLoading } = useSWR<Community[]>(
+    "communities",
+    () => communitiesService.getAllCommunities(),
+    {
+      suspense: true,
+    },
+  )
 
   const createCommunity = async ({
     description,
@@ -48,7 +39,10 @@ export function useCommunities() {
         description,
       })
 
-      setCommunities((prev) => [...prev, newCommunity])
+      mutate((prev) => {
+        if (!prev) return [newCommunity]
+        return [...prev, newCommunity]
+      })
     } catch (error) {
       toast("Erro ao criar a comunidade!")
       console.error(`Erro ao criar comunidade: ${error}`)
@@ -180,8 +174,8 @@ export function useCommunities() {
         communityId,
         userId,
       })
-      setCommunities((prev) =>
-        prev.map((community) => {
+      mutate((prev) =>
+        prev?.map((community) => {
           if (community.id !== communityId) return community
 
           return {
@@ -210,8 +204,8 @@ export function useCommunities() {
           formData,
         })
 
-      setCommunities((prev) =>
-        prev.map((community) =>
+      mutate((prev) =>
+        prev?.map((community) =>
           community.id === communityWithNewAvatar.id
             ? communityWithNewAvatar
             : community,
@@ -242,8 +236,8 @@ export function useCommunities() {
           formData,
         })
 
-      setCommunities((prev) =>
-        prev.map((community) =>
+      mutate((prev) =>
+        prev?.map((community) =>
           community.id === communityWithNewCoverPicture.id
             ? communityWithNewCoverPicture
             : community,
@@ -262,8 +256,8 @@ export function useCommunities() {
   const deleteCommunity = async (communityId: string) => {
     try {
       await communitiesService.deleteCommunity(communityId)
-      setCommunities((prev) =>
-        prev.filter((community) => community.id !== communityId),
+      mutate((prev) =>
+        prev?.filter((community) => community.id !== communityId),
       )
       toast("Comunidade deletada com sucesso!")
     } catch (error) {
@@ -297,7 +291,7 @@ export function useCommunities() {
   }
 
   return {
-    communities,
+    communities: data || [],
     isLoading,
     createCommunity,
     createPost,

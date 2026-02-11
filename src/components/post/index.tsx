@@ -123,7 +123,7 @@ export function PostComponent({
         if (reactionDetails) setCurrentReaction(reactionDetails)
       }
     })
-  }, [fetchPostComments, fetchReactions, postId, reactions, userId])
+  }, [fetchPostComments, fetchReactions, postId, userId])
 
   const handleAddComment = useCallback(
     async ({ content }: FormData) => {
@@ -163,6 +163,7 @@ export function PostComponent({
 
     setShowReactions(false)
   }
+  const totalReactionsWithoutYou = allReactions.length - 1
 
   return (
     <div className="max-w-dvw min-w-88 w-auto bg-white rounded-[2.5rem] shadow-sm overflow-hidden border border-pink-100 relative">
@@ -214,7 +215,9 @@ export function PostComponent({
           <button
             className={`flex items-center gap-2 text-${currentReaction.color} hover:text-[#D63384] transition-colors font-semibold py-3`}
           >
-            <p>Você e + {allReactions.length}</p>
+            {totalReactionsWithoutYou > 0 && (
+              <p className="text-sm">Você e + {totalReactionsWithoutYou}</p>
+            )}
             <span className="text-xl">{currentReaction.emoji}</span>
             <span className="text-sm">{currentReaction.type}</span>
           </button>

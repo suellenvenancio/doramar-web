@@ -1,4 +1,5 @@
 "use client"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
@@ -108,13 +109,13 @@ export default function CommunityDetails() {
     reset({ content: "" })
   }
 
-  const fetchPostComments = async (postId: string) => {
+  const fetchPostComments = useCallback(async (postId: string) => {
     try {
       return await getPostsComments(postId)
     } catch (error) {
       console.error("Failed to fetch communities:", error)
     }
-  }
+  }, [])
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -144,13 +145,13 @@ export default function CommunityDetails() {
     })
   }
 
-  const fetchPostReactions = async (postId: string) => {
+  const fetchPostReactions = useCallback(async (postId: string) => {
     try {
       return await getReactionsByPostId(postId)
     } catch (error) {
       console.error("Failed to fetch communities:", error)
     }
-  }
+  }, [])
 
   const userIsCommunityMember = community?.members.some(
     (m) => m.userId === user?.id,
@@ -170,16 +171,22 @@ export default function CommunityDetails() {
     communityVisibility === CommunityVisibility.PRIVATE ||
     communityVisibility === CommunityVisibility.SECRET
 
-  const onSearchMember = useCallback(async (email: string) => {
-    return await findUserByEmail(email)
-  }, [])
+  const onSearchMember = useCallback(
+    async (email: string) => {
+      return await findUserByEmail(email)
+    },
+    [findUserByEmail],
+  )
 
-  const onAddMember = useCallback(async (userId: string) => {
-    if (!communityId) return toast("Erro ao adicionar membro!")
+  const onAddMember = useCallback(
+    async (userId: string) => {
+      if (!communityId) return toast("Erro ao adicionar membro!")
 
-    await addMemberOnTheCommunity(communityId, userId)
-    setShowAddMemberModal(false)
-  }, [])
+      await addMemberOnTheCommunity(communityId, userId)
+      setShowAddMemberModal(false)
+    },
+    [addMemberOnTheCommunity, communityId],
+  )
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -233,11 +240,14 @@ export default function CommunityDetails() {
     }
   }
 
-  const handleDeleteCommunity = useCallback(async (communityId: string) => {
-    await deleteCommunity(communityId).then(() => {
-      router.push("/communities")
-    })
-  }, [])
+  const handleDeleteCommunity = useCallback(
+    async (communityId: string) => {
+      await deleteCommunity(communityId).then(() => {
+        router.push("/communities")
+      })
+    },
+    [deleteCommunity, router],
+  )
 
   const handleDeletePost = useCallback(
     async (postId: string) => {
@@ -249,7 +259,7 @@ export default function CommunityDetails() {
       await deletePost(postId, communityId)
       setPosts((prev) => prev.filter((post) => post.id !== postId))
     },
-    [communityId],
+    [communityId, deletePost],
   )
 
   const handleDeleteComment = useCallback(
@@ -261,7 +271,7 @@ export default function CommunityDetails() {
 
       await deleteComment({ commentId, communityId, postId })
     },
-    [communityId],
+    [communityId, deleteComment],
   )
   return (
     <Layout page="Communities" className="min-w-100">

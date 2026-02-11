@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback } from "react"
+import useSWR from "swr"
 
 import { toast } from "@/components/toast"
 import { actorService } from "@/services/actors.service "
@@ -8,8 +9,6 @@ import { useUser } from "./use-user"
 
 export function useActor() {
   const { user } = useUser()
-  const [favoriteActors, setFavoriteActors] = useState<Actor[]>([])
-
   const userId = user?.id
 
   const findFavoriteActorsByUserId = useCallback(async (userId: string) => {
@@ -21,12 +20,13 @@ export function useActor() {
     }
   }, [])
 
-  useEffect(() => {
-    if (!userId) return
-    findFavoriteActorsByUserId(userId).then((actors) => {
-      setFavoriteActors(actors)
-    })
-  }, [findFavoriteActorsByUserId, userId])
+  const { data, mutate } = useSWR<Actor[]>(
+    "actors",
+    () => findFavoriteActorsByUserId(userId ?? ""),
+    {
+      suspense: true,
+    },
+  )
 
   const markActorAsFavorite = useCallback(
     async (actorId: string) => {
@@ -39,13 +39,14 @@ export function useActor() {
         const actor = await actorService.makeActorFavorite(userId, actorId)
 
         if (!actor) {
-          setFavoriteActors((prev) => prev.filter((fav) => fav.id !== actorId))
+          mutate((prev) => prev?.filter((fav) => fav.id !== actorId))
           toast("Ator removido dos favoritos!")
         } else {
-          setFavoriteActors((prev) => {
-            const exists = prev.some((fav) => fav.id === actor.id)
-            if (exists) return prev
-            return [...prev, actor]
+          mutate((prev) => {
+            if (prev) {
+              return [...prev, actor]
+            }
+            return [actor]
           })
           toast(`${actor.name} adicionado aos favoritos!`)
         }
@@ -54,12 +55,12 @@ export function useActor() {
         toast("Erro ao atualizar favoritos.")
       }
     },
-    [userId],
+    [mutate, userId],
   )
 
   return {
     markActorAsFavorite,
-    favoriteActors,
+    favoriteActors: data,
     findFavoriteActorsByUserId,
   }
 }

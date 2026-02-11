@@ -1,66 +1,41 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
+import useSWR from "swr"
 
 import { toast } from "@/components/toast"
 import { tvShowService } from "@/services/tvShow.service"
-import type { TvShow, TvShowWithPagination, WatchedTvShow } from "@/types"
+import { type TvShow } from "@/types"
 
 import { useUser } from "./use-user"
 
 export function useTvShow() {
-  const [tvShows, setTvShows] = useState<TvShow[]>([])
-  const [tvShowsByPage, setTvShowByPage] = useState<TvShowWithPagination>()
-  const [watchedStatus, setWatchedStatus] = useState<
-    { id: number; label: string }[]
-  >([])
-  const [watchedTvShows, setWatchedTvShows] = useState<WatchedTvShow[]>([])
-  const [isLoadingTvShowsByPage, setIsLoadingTvShowsByPage] = useState(false)
-  const [favoriteTvShow, setFavoriteTvShow] = useState<TvShow>()
   const { user } = useUser()
-
   const userId = user?.id
 
-  useEffect(() => {
-    const fetchTvShowAndWatchedStatus = async () => {
-      try {
-        setIsLoadingTvShowsByPage(true)
-        const [
-          fetchedTvShows,
-          fetchedWatchedStatus,
-          fetchTvShowsByPage,
-          fetcheFavTvShow,
-        ] = await Promise.all([
-          tvShowService.getAllTvShows(),
-          tvShowService.getWatchedStatus(),
-          tvShowService.getTvShowsByPage(1, 20),
-          tvShowService.findFavoriteTvShowByUserId(userId || ""),
-        ])
-        setTvShows(fetchedTvShows)
-        setWatchedStatus(fetchedWatchedStatus)
-        setTvShowByPage(fetchTvShowsByPage)
-        setFavoriteTvShow(fetcheFavTvShow)
-      } catch (e) {
-        console.error("Erro ao buscar doramas e status assistido!", e)
-      } finally {
-        setIsLoadingTvShowsByPage(false)
-      }
-    }
-    fetchTvShowAndWatchedStatus()
-  }, [])
+  const limit = 20
+  const [page, setPage] = useState(1)
 
-  useEffect(() => {
-    const fetchWatchedTvShows = async () => {
-      if (!userId) return
-      try {
-        const fetchedWatchedTvshows =
-          await tvShowService.getWatchedTvShowsByUserId(userId)
+  const { data: tvShows } = useSWR("tvShows", () =>
+    tvShowService.getAllTvShows(),
+  )
 
-        setWatchedTvShows(fetchedWatchedTvshows)
-      } catch (e) {
-        console.error(`Erro ao buscar doramas assistidos: ${e}`)
-      }
-    }
-    fetchWatchedTvShows()
-  }, [userId])
+  const { data: watchedStatus } = useSWR("watchedStatus", () =>
+    tvShowService.getWatchedStatus(),
+  )
+
+  const { data: watchedTvShows, mutate: mutateWatchedTvShows } = useSWR(
+    "watchedTvShows",
+    () => tvShowService.getWatchedTvShowsByUserId(userId || ""),
+  )
+
+  const { data: favoriteTvShow, mutate: mutateFavoriteTvShow } = useSWR<TvShow>(
+    "favoriteTvShow",
+    () => tvShowService.findFavoriteTvShowByUserId(userId || ""),
+  )
+
+  const { data: tvShowsByPage, isLoading: isLoadingTvShowsByPage } = useSWR(
+    ["tvShowsByPage", page, limit],
+    () => tvShowService.getTvShowsByPage(page, limit),
+  )
 
   const markTvShowAsWatched = useCallback(
     async (tvShow: TvShow, watchedStatusId: string) => {
@@ -72,24 +47,16 @@ export function useTvShow() {
           watchedStatusId,
         )
 
-        const updatedWatchedTvShows =
-          await tvShowService.getWatchedTvShowsByUserId(userId)
-        setWatchedTvShows(updatedWatchedTvShows)
+        mutateWatchedTvShows()
       } catch (e) {
         console.error("Erro ao marcar dorama como assistido!", e)
       }
     },
-    [userId],
+    [userId, mutateWatchedTvShows],
   )
 
-  const fetchTvShowsByPage = async (page: number, limit: number) => {
-    try {
-      const newPageTvShows = await tvShowService.getTvShowsByPage(page, limit)
-      setTvShowByPage(newPageTvShows)
-    } catch (error) {
-      console.error("Erro ao buscar doramas da próxima página!", error)
-      toast("Erro ao buscar doramas da próxima página!")
-    }
+  const fetchTvShowsByPage = (newPage: number) => {
+    setPage(newPage)
   }
 
   const getWatchedTvShowsByUserId = async (userId: string) => {
@@ -103,7 +70,6 @@ export function useTvShow() {
 
   const findFavoriteTvShowByUserId = useCallback(async (userId: string) => {
     try {
-      console.log(userId)
       return await tvShowService.findFavoriteTvShowByUserId(userId)
     } catch (e) {
       console.error(`Erro ao buscar doramas favoritos: ${e}`)
@@ -124,7 +90,7 @@ export function useTvShow() {
           tvShow.id,
         )
 
-        setFavoriteTvShow(updatedFavTvShow)
+        mutateFavoriteTvShow(updatedFavTvShow)
 
         const action = updatedFavTvShow ? "adicionado" : "removido"
         toast(`${tvShow.title} ${action} como favorito!`)
@@ -133,7 +99,7 @@ export function useTvShow() {
         toast(`Erro ao atualizar favorito: ${tvShow.title}`)
       }
     },
-    [user, setFavoriteTvShow],
+    [user, mutateFavoriteTvShow],
   )
 
   const removeTvShowFromWatched = async (tvShow: TvShow) => {
@@ -143,24 +109,22 @@ export function useTvShow() {
     }
     try {
       await tvShowService.removeTvShowFromWatched(userId, tvShow.id)
-      setWatchedTvShows((prev) =>
-        prev.filter((watched) => watched.id !== tvShow.id),
-      )
+      mutateWatchedTvShows()
     } catch (e) {
       console.error(`Erro ao remover ${tvShow.title} dos assistidos: ${e}`)
     }
   }
   return {
-    tvShows,
-    watchedStatus,
-    watchedTvShows,
+    tvShows: tvShows || [],
+    watchedStatus: watchedStatus || [],
+    watchedTvShows: watchedTvShows || [],
     markTvShowAsWatched,
-    tvShowsByPage,
+    tvShowsByPage: tvShowsByPage,
     fetchTvShowsByPage,
     getWatchedTvShowsByUserId,
     isLoadingTvShowsByPage,
     findFavoriteTvShowByUserId,
-    favoriteTvShow,
+    favoriteTvShow: favoriteTvShow,
     markTvShowAsFavorite,
     removeTvShowFromWatched,
   }

@@ -76,7 +76,7 @@ export default function CommunitiesPage() {
             </p>
             <p className="mt-2 text-sm text-[#8F7A8C]">
               Crie agora sua comunidade para compartilhar sobre seus doramas com
-              seus amigos ✨
+              seus amigos✨
             </p>
           </div>
         )}

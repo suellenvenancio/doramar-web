@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback } from "react"
+import useSWR from "swr"
 
 import { toast } from "@/components/toast"
 import { ratingService } from "@/services/ratings.service"
@@ -7,23 +8,20 @@ import type { RatingWithTvShow } from "@/types"
 import { useUser } from "./use-user"
 
 export function useRating() {
-  const [ratings, setRatings] = useState<RatingWithTvShow[]>([])
   const { user } = useUser()
 
   const userId = user?.id
 
-  useEffect(() => {
-    const fetchRatings = async () => {
-      if (!userId) return
-      try {
-        const fetchedRatings = await ratingService.getRatingsByUserId(userId)
-        setRatings(fetchedRatings)
-      } catch (error) {
-        console.error("Failed to fetch ratings:", error)
-      }
-    }
-    fetchRatings()
-  }, [userId])
+  const { data, mutate } = useSWR<RatingWithTvShow[]>(
+    "ratings",
+    () => {
+      if (!userId) return []
+      return ratingService.getRatingsByUserId(userId)
+    },
+    {
+      suspense: true,
+    },
+  )
 
   const createRating = useCallback(
     async (tvShowId: string, scaleId: number) => {
@@ -33,13 +31,14 @@ export function useRating() {
           return
         }
         await ratingService.createRating(userId, tvShowId, scaleId)
+        mutate()
       } catch (error) {
         toast("Erro ao avaliar dorama!")
 
         console.error(`Erro ao ao avaliação: ${error}`)
       }
     },
-    [userId],
+    [mutate, userId],
   )
 
   const getRatingsByUserId = async (userId: string) => {
@@ -53,7 +52,7 @@ export function useRating() {
 
   return {
     createRating,
-    ratings,
+    ratings: data || [],
     getRatingsByUserId,
   }
 }
