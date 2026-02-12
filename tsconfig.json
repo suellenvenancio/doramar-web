@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "types": [
-      "node" 
+      "node"
     ],
     "lib": [
       "ES2023",
@@ -41,12 +41,12 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     "src/types/**/*.d.ts",
-    ".next/types/**/*.ts", 
-    "jest.config.ts"
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "**/*.spec.ts",
     "**/*.test.ts",
-    "node_modules" 
+    "node_modules"
   ]
 }

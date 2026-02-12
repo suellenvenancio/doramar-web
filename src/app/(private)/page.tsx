@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 "use client"
 import { useCallback, useMemo, useState } from "react"
 
@@ -166,8 +165,7 @@ export default function HomePage() {
       }}
       currentPage={currentPage}
     >
-      <div
-        className="w-full mt-6 flex flex-col md:flex-row md:flex-wrap md:items-start md:justify-evenly p-6">
+      <div className="w-full mt-6 flex flex-col md:flex-row md:flex-wrap md:items-start md:justify-evenly p-6">
         {isLoadingTvShowsByPage ? (
           <div className="flex flex-col items-center justify-center w-full py-24">
             <CircleIcon className="h-12 w-12 text-pink-600" />
