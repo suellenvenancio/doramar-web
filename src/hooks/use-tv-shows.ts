@@ -90,7 +90,7 @@ export function useTvShow() {
           tvShow.id,
         )
 
-        mutateFavoriteTvShow(updatedFavTvShow)
+        mutateFavoriteTvShow()
 
         const action = updatedFavTvShow ? "adicionado" : "removido"
         toast(`${tvShow.title} ${action} como favorito!`)

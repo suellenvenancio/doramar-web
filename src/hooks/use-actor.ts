@@ -33,17 +33,10 @@ export function useActor() {
 
       try {
         const actor = await actorService.makeActorFavorite(userId, actorId)
-
+        mutate()
         if (!actor) {
-          mutate((prev) => prev?.filter((fav) => fav.id !== actorId))
           toast("Ator removido dos favoritos!")
         } else {
-          mutate((prev) => {
-            if (prev) {
-              return [...prev, actor]
-            }
-            return [actor]
-          })
           toast(`${actor.name} adicionado aos favoritos!`)
         }
       } catch (e) {

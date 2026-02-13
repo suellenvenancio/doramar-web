@@ -85,7 +85,7 @@ export function useList() {
         tvShowId: tvShow.id,
       })
 
-      mutate((prev) => prev?.filter((list) => list.id !== listId))
+      mutate()
     } catch (error) {
       toast(`Erro ao adicionar ${tvShow.title} à lista!`)
       console.error(`Erro ao remover item da lista: ${error}`)

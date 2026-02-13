@@ -28,17 +28,14 @@ export function useCommunities() {
       return
     }
     try {
-      const newCommunity = await communitiesService.createCommunity({
+      await communitiesService.createCommunity({
         name,
         userId,
         visibility,
         description,
       })
 
-      mutate((prev) => {
-        if (!prev) return [newCommunity]
-        return [...prev, newCommunity]
-      })
+      mutate()
     } catch (error) {
       toast("Erro ao criar a comunidade!")
       console.error(`Erro ao criar comunidade: ${error}`)
@@ -166,20 +163,11 @@ export function useCommunities() {
     userId: string,
   ) => {
     try {
-      const newMember = await communitiesService.addMemberOnTheCommunity({
+      await communitiesService.addMemberOnTheCommunity({
         communityId,
         userId,
       })
-      mutate((prev) =>
-        prev?.map((community) => {
-          if (community.id !== communityId) return community
-
-          return {
-            ...community,
-            members: [...community.members, newMember],
-          }
-        }),
-      )
+      mutate()
     } catch (error) {
       console.error("Erro ao adicionar participante a comunidade", error)
       toast("Erro ao adicionar participante")
@@ -200,13 +188,7 @@ export function useCommunities() {
           formData,
         })
 
-      mutate((prev) =>
-        prev?.map((community) =>
-          community.id === communityWithNewAvatar.id
-            ? communityWithNewAvatar
-            : community,
-        ),
-      )
+      mutate()
       return communityWithNewAvatar
     } catch (error) {
       toast("Erro ao fazer upload da imagem do perfil da comunidade")
@@ -232,13 +214,7 @@ export function useCommunities() {
           formData,
         })
 
-      mutate((prev) =>
-        prev?.map((community) =>
-          community.id === communityWithNewCoverPicture.id
-            ? communityWithNewCoverPicture
-            : community,
-        ),
-      )
+      mutate()
       return communityWithNewCoverPicture
     } catch (error) {
       console.error(
