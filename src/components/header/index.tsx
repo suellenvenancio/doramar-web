@@ -1,11 +1,13 @@
 import Cookies from "js-cookie"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 import doramar from "@/assets/doramar.png"
 import { auth } from "@/firebase.config"
+import { useGenres } from "@/hooks/use-genres"
 import { AuthService } from "@/services/auth.service"
-import { ButtonTypeEnum, type Genre, type Page } from "@/types"
+import { ButtonTypeEnum, type Page } from "@/types"
 
 import { IconButton } from "../button/iconButton"
 import { ExitIcon } from "../icons/exit"
@@ -16,24 +18,27 @@ import { SearchInput } from "../searchInput"
 interface HeaderProps {
   search?: string
   setSearch?: (value: string) => void
-  activePopup?: ButtonTypeEnum | null
-  genres?: Genre[]
   selectedGenres?: string[]
   onSelectGenre?: (genreId: string) => void
-  setActivePopUp?: () => void
   page?: Page
 }
 export function Header({
   search,
   setSearch,
-  activePopup,
-  genres,
   selectedGenres,
   onSelectGenre,
-  setActivePopUp,
   page,
 }: HeaderProps) {
+  const [activePopup, setActivePopup] = useState<ButtonTypeEnum | null>(null)
+
+  const { genres } = useGenres()
   const router = useRouter()
+
+  const onActivePopUp = () => {
+    setActivePopup((prev) =>
+      prev === ButtonTypeEnum.FILTER ? null : ButtonTypeEnum.FILTER,
+    )
+  }
 
   const handleSignOut = async () => {
     const authService = new AuthService(auth)
@@ -58,7 +63,7 @@ export function Header({
             <IconButton
               data-testid="filter-button"
               icon={<FilterIcon />}
-              onClick={setActivePopUp}
+              onClick={onActivePopUp}
               className="text-[#e91e63] ml-4"
             />
             {activePopup === ButtonTypeEnum.FILTER && (

@@ -1,25 +1,22 @@
+import { useActor } from "@/hooks/use-actor"
+
 import type { Actor } from "../../types"
-import { HeartIcon } from "../icons/heart"
-import { Avatar } from "../avatar" 
+import { Avatar } from "../avatar"
 import { IconButton } from "../button/iconButton"
+import { HeartIcon } from "../icons/heart"
 
 interface CastModalProps {
-  isOpen: boolean
   onClose: () => void
   actors: Actor[]
-  onClick: (actor: Actor) => void
-  favoriteActors: Actor[]
 }
 
-export function CastModal({
-  isOpen,
-  onClose,
-  actors,
-  onClick,
-  favoriteActors,
-}: CastModalProps) {
-  if (!isOpen) return null 
-  
+export function CastModal({ onClose, actors }: CastModalProps) {
+  const { markActorAsFavorite, favoriteActors } = useActor()
+
+  const handleMakeActorFavorite = async (actor: Actor) => {
+    await markActorAsFavorite(actor.id)
+  }
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex justify-center items-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
@@ -31,10 +28,10 @@ export function CastModal({
           >
             Fechar
           </button>
-        </div> 
+        </div>
         <div className="p-4 space-y-3 max-h-[70vh] overflow-y-auto">
           {actors.map((actor) => {
-            const isFavorite = favoriteActors.some(fav => fav.id === actor.id)
+            const isFavorite = favoriteActors.some((fav) => fav.id === actor.id)
 
             return (
               <div
@@ -62,7 +59,7 @@ export function CastModal({
                       }`}
                     />
                   }
-                  onClick={() => onClick(actor)}
+                  onClick={() => handleMakeActorFavorite(actor)}
                 />
               </div>
             )
