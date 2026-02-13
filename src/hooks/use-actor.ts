@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback } from "react"
+import useSWR from "swr"
 
 import { toast } from "@/components/toast"
 import { actorService } from "@/services/actors.service "
@@ -8,8 +9,6 @@ import { useUser } from "./use-user"
 
 export function useActor() {
   const { user } = useUser()
-  const [favoriteActors, setFavoriteActors] = useState<Actor[]>([])
-
   const userId = user?.id
 
   const findFavoriteActorsByUserId = useCallback(async (userId: string) => {
@@ -21,12 +20,9 @@ export function useActor() {
     }
   }, [])
 
-  useEffect(() => {
-    if (!userId) return
-    findFavoriteActorsByUserId(userId).then((actors) => {
-      setFavoriteActors(actors)
-    })
-  }, [findFavoriteActorsByUserId, userId])
+  const { data, mutate } = useSWR<Actor[]>("actors", () =>
+    findFavoriteActorsByUserId(userId ?? ""),
+  )
 
   const markActorAsFavorite = useCallback(
     async (actorId: string) => {
@@ -37,16 +33,10 @@ export function useActor() {
 
       try {
         const actor = await actorService.makeActorFavorite(userId, actorId)
-
+        mutate()
         if (!actor) {
-          setFavoriteActors((prev) => prev.filter((fav) => fav.id !== actorId))
           toast("Ator removido dos favoritos!")
         } else {
-          setFavoriteActors((prev) => {
-            const exists = prev.some((fav) => fav.id === actor.id)
-            if (exists) return prev
-            return [...prev, actor]
-          })
           toast(`${actor.name} adicionado aos favoritos!`)
         }
       } catch (e) {
@@ -54,12 +44,12 @@ export function useActor() {
         toast("Erro ao atualizar favoritos.")
       }
     },
-    [userId],
+    [mutate, userId],
   )
 
   return {
     markActorAsFavorite,
-    favoriteActors,
+    favoriteActors: data,
     findFavoriteActorsByUserId,
   }
 }

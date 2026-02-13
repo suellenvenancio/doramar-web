@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback } from "react"
+import useSWR from "swr"
 
 import { toast } from "@/components/toast"
 import { listService } from "@/services/lists.service"
@@ -7,28 +8,14 @@ import type { List, ListWithTvShows, TvShow } from "@/types"
 import { useUser } from "./use-user"
 
 export function useList() {
-  const [lists, setLists] = useState<ListWithTvShows[]>([])
-  const [isLoading, setIsLoading] = useState(false)
   const { user } = useUser()
 
   const userId = user?.id
 
-  useEffect(() => {
-    const fetchLists = async () => {
-      if (!userId) return
-
-      try {
-        setIsLoading(true)
-        const fetchedLists = await listService.getListsByUserId(userId)
-        setLists(fetchedLists)
-      } catch (error) {
-        console.log(`Erro ao buscar listas: ${error}`)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    fetchLists()
-  }, [userId])
+  const { data, mutate, isLoading } = useSWR<ListWithTvShows[]>("lists", () => {
+    if (!userId) return []
+    return listService.getListsByUserId(userId)
+  })
 
   const addTvShowToList = useCallback(
     async (list: List, tvShow: TvShow) => {
@@ -39,15 +26,13 @@ export function useList() {
       try {
         await listService.addTvShowToList(list.id, tvShow.id, userId)
         toast(`${tvShow.title} adicionado a lista, com sucesso`)
-        const listsFetched = await listService.getListsByUserId(userId)
-
-        setLists(listsFetched)
+        mutate()
       } catch (error) {
         toast(`Erro ao adicionar ${tvShow.title} à lista!`)
         console.error(error)
       }
     },
-    [userId],
+    [mutate, userId],
   )
 
   const createList = useCallback(
@@ -59,34 +44,26 @@ export function useList() {
 
       try {
         await listService.createList(name, userId)
-        const fetchedLists = await listService.getListsByUserId(userId)
-
-        setLists(fetchedLists)
+        mutate()
       } catch (error) {
         toast("Erro ao cria lista!")
         console.error(`Erro ao criar lista: ${error}`)
       }
     },
-    [userId],
+    [mutate, userId],
   )
 
   const deleteList = useCallback(
     async (listId: string) => {
       try {
         await listService.deleteList(listId)
-        if (!userId) {
-          toast("Erro ao buscar listas!")
-          return
-        }
-        const fetchedLists = await listService.getListsByUserId(userId)
-
-        setLists(fetchedLists)
+        mutate()
       } catch (error) {
         toast("Erro ao excluir lista!")
         console.error(`Error ao remover lista: ${error}`)
       }
     },
-    [userId],
+    [mutate],
   )
 
   const removeTvShowFromTheList = async ({
@@ -108,9 +85,7 @@ export function useList() {
         tvShowId: tvShow.id,
       })
 
-      const listsFetched = await listService.getListsByUserId(userId)
-
-      setLists(listsFetched)
+      mutate()
     } catch (error) {
       toast(`Erro ao adicionar ${tvShow.title} à lista!`)
       console.error(`Erro ao remover item da lista: ${error}`)
@@ -133,8 +108,8 @@ export function useList() {
         userId,
       })
 
-      setLists((prevLists) =>
-        prevLists.map((list) =>
+      mutate((prevLists) =>
+        prevLists?.map((list) =>
           list.id === updatedList.id ? updatedList : list,
         ),
       )
@@ -154,7 +129,7 @@ export function useList() {
   }
 
   return {
-    lists,
+    lists: data || [],
     addTvShowToList,
     createList,
     deleteList,
