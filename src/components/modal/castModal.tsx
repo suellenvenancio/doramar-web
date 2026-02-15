@@ -42,7 +42,7 @@ export function CastModal({ onClose, actors }: CastModalProps) {
                   <Avatar
                     imageUrl={actor.image}
                     title={actor.name}
-                    className="rounded-full w-16 h-14 mb-2"
+                    className="rounded-full w-16 h-16 mb-2"
                   />
 
                   <div>
