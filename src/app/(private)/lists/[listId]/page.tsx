@@ -18,8 +18,9 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { useParams } from "next/navigation"
-import { useCallback, useMemo } from "react"
+import { Suspense, useCallback, useMemo } from "react"
 
+import Loading from "@/app/loading"
 import { IconButton } from "@/components/button/iconButton"
 import { EyeIcon } from "@/components/icons/eye"
 import { MenuIcon } from "@/components/icons/menu"
@@ -92,49 +93,51 @@ export default function ListsDetailsPage() {
   )
   return (
     <Layout page="Lists">
-      {listTvShows && listTvShows?.length > 0 ? (
-        <div className="w-full">
-          <DndContext
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}
-          >
-            <SortableContext
-              items={items.map((i) => i.id)}
-              strategy={verticalListSortingStrategy}
+      <Suspense fallback={<Loading />}>
+        {listTvShows && listTvShows?.length > 0 ? (
+          <div className="w-full">
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              sensors={sensors}
             >
-              {items
-                ? items?.map((tvShow) => {
-                    const tvShowWasWatched = wasWatched(tvShow.id)
-                    const handleWithWatchStatus = tvShowWasWatched
-                      ? removeTvShowFromWatched
-                      : markTvShowAsWatched
+              <SortableContext
+                items={items.map((i) => i.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {items
+                  ? items?.map((tvShow) => {
+                      const tvShowWasWatched = wasWatched(tvShow.id)
+                      const handleWithWatchStatus = tvShowWasWatched
+                        ? removeTvShowFromWatched
+                        : markTvShowAsWatched
 
-                    return (
-                      <ListItem
-                        key={tvShow.id}
-                        tvShow={tvShow}
-                        onRemoveTvShow={removeTvShow}
-                        listId={listId!}
-                        wasWatched={tvShowWasWatched}
-                        handleWithWatchStatus={handleWithWatchStatus}
-                      />
-                    )
-                  })
-                : null}
-            </SortableContext>
-          </DndContext>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-24 text-center m-2">
-          <p className="text-lg font-semibold text-[#6E5A6B]">
-            Não existe nenhum dorama na sua lista!
-          </p>
-          <p className="mt-2 text-sm text-[#8F7A8C]">
-            Vá até a página inicial e adicione✨
-          </p>
-        </div>
-      )}
+                      return (
+                        <ListItem
+                          key={tvShow.id}
+                          tvShow={tvShow}
+                          onRemoveTvShow={removeTvShow}
+                          listId={listId!}
+                          wasWatched={tvShowWasWatched}
+                          handleWithWatchStatus={handleWithWatchStatus}
+                        />
+                      )
+                    })
+                  : null}
+              </SortableContext>
+            </DndContext>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 text-center m-2">
+            <p className="text-lg font-semibold text-[#6E5A6B]">
+              Não existe nenhum dorama na sua lista!
+            </p>
+            <p className="mt-2 text-sm text-[#8F7A8C]">
+              Vá até a página inicial e adicione✨
+            </p>
+          </div>
+        )}
+      </Suspense>
     </Layout>
   )
 }

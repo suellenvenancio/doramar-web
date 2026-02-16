@@ -1,8 +1,9 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { Suspense, useState } from "react"
 
+import Loading from "@/app/loading"
 import { IconButton } from "@/components/button/iconButton"
 import { CircleIcon } from "@/components/icons/circle"
 import { TrashIcon } from "@/components/icons/trash"
@@ -23,17 +24,18 @@ export default function ListsPage() {
 
   return (
     <Layout className="w-full h-full" page="Lists">
-      <div
-        className={mergeCn(
-          "flex flex-col md:justify-start items-center md:items-start w-full",
-          {
-            "md:items-center": lists.length === 0,
-          },
-        )}
-      >
-        <div className="mb-6 flex items-center justify-center">
-          <button
-            className="
+      <Suspense fallback={<Loading />}>
+        <div
+          className={mergeCn(
+            "flex flex-col md:justify-start items-center md:items-start w-full",
+            {
+              "md:items-center": lists.length === 0,
+            },
+          )}
+        >
+          <div className="mb-6 flex items-center justify-center">
+            <button
+              className="
               flex items-center gap-2
               rounded-full
               bg-[#F2A7C6]
@@ -46,48 +48,49 @@ export default function ListsPage() {
               ml-4
               md:mr-0
             "
-            onClick={() => setShowCreateListModal(true)}
-          >
-            <span className="text-lg leading-none">+</span>
-            Nova lista
-          </button>
-        </div>
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center w-full py-24">
-            <CircleIcon className="h-12 w-12 text-pink-600" />
+              onClick={() => setShowCreateListModal(true)}
+            >
+              <span className="text-lg leading-none">+</span>
+              Nova lista
+            </button>
           </div>
-        )}
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center w-full py-24">
+              <CircleIcon className="h-12 w-12 text-pink-600" />
+            </div>
+          )}
 
-        {lists.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <p className="text-lg font-semibold text-[#6E5A6B]">
-              Você ainda não criou nenhuma lista
-            </p>
-            <p className="mt-2 text-sm text-[#8F7A8C]">
-              Crie sua primeira lista para organizar seus doramas ✨
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full p-6">
-            {lists.map((list) => (
-              <ListCard
-                key={list.id}
-                listId={list.id ?? ""}
-                name={list.name ?? ""}
-                total={list.tvShows.length}
-                onClickInTheList={() => {
-                  router.push(`/lists/${list.id}`)
-                }}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-      <CreateListModal
-        isOpen={showCreateListModal}
-        onClose={() => setShowCreateListModal(false)}
-        onCreate={onCreateList}
-      />
+          {lists.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <p className="text-lg font-semibold text-[#6E5A6B]">
+                Você ainda não criou nenhuma lista
+              </p>
+              <p className="mt-2 text-sm text-[#8F7A8C]">
+                Crie sua primeira lista para organizar seus doramas ✨
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full p-6">
+              {lists.map((list) => (
+                <ListCard
+                  key={list.id}
+                  listId={list.id ?? ""}
+                  name={list.name ?? ""}
+                  total={list.tvShows.length}
+                  onClickInTheList={() => {
+                    router.push(`/lists/${list.id}`)
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+        <CreateListModal
+          isOpen={showCreateListModal}
+          onClose={() => setShowCreateListModal(false)}
+          onCreate={onCreateList}
+        />
+      </Suspense>
     </Layout>
   )
 }

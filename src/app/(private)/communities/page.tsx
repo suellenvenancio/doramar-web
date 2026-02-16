@@ -1,7 +1,8 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { Activity, Suspense, useState } from "react"
 
+import Loading from "@/app/loading"
 import { Avatar } from "@/components/avatar"
 import { CircleIcon } from "@/components/icons/circle"
 import { Layout } from "@/components/layout"
@@ -18,18 +19,22 @@ export default function CommunitiesPage() {
 
   return (
     <Layout page="Communities">
-      <div
-        className={mergeCn("flex flex-col items-center justify-center w-full", {
-          "md:items-start": communities.length > 0,
-        })}
-      >
+      <Suspense fallback={<Loading />}>
         <div
-          className={mergeCn("mb-6 flex items-center justify-center w-full", {
-            "md:justify-start": communities.length > 0,
-          })}
+          className={mergeCn(
+            "flex flex-col items-center justify-center w-full",
+            {
+              "md:items-start": communities.length > 0,
+            },
+          )}
         >
-          <button
-            className="
+          <div
+            className={mergeCn("mb-6 flex items-center justify-center w-full", {
+              "md:justify-start": communities.length > 0,
+            })}
+          >
+            <button
+              className="
               flex items-center gap-2
               rounded-full
               bg-[#F2A7C6]
@@ -42,53 +47,53 @@ export default function CommunitiesPage() {
               ml-4
               md:mr-0
             "
-            onClick={() => setShowCreateCommunityModal(true)}
-          >
-            <span className="text-lg leading-none">+</span>
-            Nova comunidade
-          </button>
+              onClick={() => setShowCreateCommunityModal(true)}
+            >
+              <span className="text-lg leading-none">+</span>
+              Nova comunidade
+            </button>
+          </div>
+
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center w-full py-24">
+              <CircleIcon className="h-12 w-12 text-pink-600" />
+            </div>
+          )}
+          {communities?.length > 0 ? (
+            <div className="flex flex-col md:flex-row items-center justify-center md:gap-6 md:flex-wrap md:justify-start">
+              {communities.map((community) => (
+                <CommunityCard
+                  key={community.id}
+                  name={community.name}
+                  totalMembers={community.members.length}
+                  onClickInTheCommunity={() =>
+                    router.push(`/communities/${community.id}`)
+                  }
+                  avatar={community.avatarUrl}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-24 text-center m-2">
+              <p className="text-lg font-semibold text-[#6E5A6B]">
+                Não existe nenhuma comunidade disponível!
+              </p>
+              <p className="mt-2 text-sm text-[#8F7A8C]">
+                Crie agora sua comunidade para compartilhar sobre seus doramas
+                com seus amigos✨
+              </p>
+            </div>
+          )}
+          <Activity mode={showCreateCommunityModal ? "visible" : "hidden"}>
+            <CreateCommunityModal
+              onClose={() => {
+                setShowCreateCommunityModal(false)
+              }}
+              onCreate={createCommunity}
+            />
+          </Activity>
         </div>
-
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center w-full py-24">
-            <CircleIcon className="h-12 w-12 text-pink-600" />
-          </div>
-        )}
-
-        {communities?.length > 0 ? (
-          <div className="flex flex-col md:flex-row items-center justify-center md:gap-6 md:flex-wrap md:justify-start">
-            {communities.map((community) => (
-              <CommunityCard
-                key={community.id}
-                name={community.name}
-                totalMembers={community.members.length}
-                onClickInTheCommunity={() =>
-                  router.push(`/communities/${community.id}`)
-                }
-                avatar={community.avatarUrl}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-24 text-center m-2">
-            <p className="text-lg font-semibold text-[#6E5A6B]">
-              Não existe nenhuma comunidade disponível!
-            </p>
-            <p className="mt-2 text-sm text-[#8F7A8C]">
-              Crie agora sua comunidade para compartilhar sobre seus doramas com
-              seus amigos✨
-            </p>
-          </div>
-        )}
-        {showCreateCommunityModal && (
-          <CreateCommunityModal
-            onClose={() => {
-              setShowCreateCommunityModal(false)
-            }}
-            onCreate={createCommunity}
-          />
-        )}
-      </div>
+      </Suspense>
     </Layout>
   )
 }
