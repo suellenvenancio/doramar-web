@@ -7,7 +7,6 @@ import {
   Activity,
   ChangeEvent,
   RefObject,
-  Suspense,
   useCallback,
   useEffect,
   useRef,
@@ -21,7 +20,6 @@ import {
 } from "react-hook-form"
 import z from "zod"
 
-import Loading from "@/app/loading"
 import { Avatar } from "@/components/avatar"
 import { CustomButton } from "@/components/button"
 import { IconButton } from "@/components/button/iconButton"
@@ -292,198 +290,189 @@ export default function CommunityDetails() {
   )
   return (
     <Layout page="Communities" className="min-w-100">
-      <Suspense fallback={<Loading />}>
-        <div className="w-full p-4 grid grid-cols-3 gap-6 items-start">
-          <div className="col-span-3 md:col-span-2 flex flex-col gap-6">
-            <div className="relative mt-4 w-full">
-              <div
-                onClick={() =>
-                  userIsOwnerOrModerator && fileCoverRef.current?.click()
-                }
-                className="relative h-48 w-full cursor-pointer group"
-              >
-                {community?.coverUrl ? (
-                  <Image
-                    src={community.coverUrl}
-                    alt="cover"
-                    fill
-                    className="object-cover rounded-xl"
-                    priority
-                  />
-                ) : (
-                  <div className="h-full w-full bg-pink-600 rounded-xl flex items-center justify-center" />
-                )}
-                {isUploadingCover && (
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-xl text-white">
-                    Carregando...
-                  </div>
-                )}
-              </div>
-              <input
-                type="file"
-                ref={fileCoverRef}
-                className="hidden"
-                accept="image/*"
-                onChange={handleCoverFileChange}
-              />
+      <div className="w-full p-4 grid grid-cols-3 gap-6 items-start">
+        <div className="col-span-3 md:col-span-2 flex flex-col gap-6">
+          <div className="relative mt-4 w-full">
+            <div
+              onClick={() =>
+                userIsOwnerOrModerator && fileCoverRef.current?.click()
+              }
+              className="relative h-48 w-full cursor-pointer group"
+            >
+              {community?.coverUrl ? (
+                <Image
+                  src={community.coverUrl}
+                  alt="cover"
+                  fill
+                  className="object-cover rounded-xl"
+                  priority
+                />
+              ) : (
+                <div className="h-full w-full bg-pink-600 rounded-xl flex items-center justify-center" />
+              )}
+              {isUploadingCover && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-xl text-white">
+                  Carregando...
+                </div>
+              )}
+            </div>
+            <input
+              type="file"
+              ref={fileCoverRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleCoverFileChange}
+            />
 
-              <div className="relative mt-[-40px] bg-white rounded-xl shadow-md border border-gray-100 p-6 w-full">
-                <div className="flex flex-row items-center gap-2">
-                  <div className="relative -mt-20">
-                    <div
-                      className={`cursor-pointer hover:opacity-90 transition${isUploadingAvatar ? "animate-pulse" : ""}`}
-                      onClick={
-                        userIsOwnerOrModerator
-                          ? () => fileAvatarRef.current?.click()
-                          : undefined
-                      }
-                      title="Clique para alterar a foto"
-                    >
-                      <Avatar
-                        title={community?.name ?? ""}
-                        imageUrl={community?.avatarUrl}
-                        className="top h-40 w-36 shadow-lg rounded-xl"
-                      />
-                      {isUploadingAvatar && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-full">
-                          <span className="text-white text-xs font-bold">
-                            ...
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <input
-                      type="file"
-                      ref={fileAvatarRef}
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                    />
-                    <div className="mt-4">
-                      <p className="text-xl md:text-2xl mb-2 font-bold">
-                        {community?.name}
-                      </p>
-                      <div className="flex flex-row gap-1">
-                        <CommunityIcon />
-                        <p className="text-sm md:text-base">
-                          {community?.members.length} membro(s)
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Activity
-                    mode={userIsOwnerOrModerator ? "visible" : "hidden"}
+            <div className="relative mt-[-40px] bg-white rounded-xl shadow-md border border-gray-100 p-6 w-full">
+              <div className="flex flex-row items-center gap-2">
+                <div className="relative -mt-20">
+                  <div
+                    className={`cursor-pointer hover:opacity-90 transition${isUploadingAvatar ? "animate-pulse" : ""}`}
+                    onClick={
+                      userIsOwnerOrModerator
+                        ? () => fileAvatarRef.current?.click()
+                        : undefined
+                    }
+                    title="Clique para alterar a foto"
                   >
-                    <div className="absolute top-4 right-4 z-20">
-                      <IconButton
-                        icon={<TrashIcon className="text-pink-600" />}
-                        onClick={() =>
-                          setShowCommunityModal(!showCommunityModal)
-                        }
-                      />
-                      <ConfirmationModal
-                        isOpen={showCommunityModal}
-                        onClose={() => setShowCommunityModal(false)}
-                        onClick={handleDeleteCommunity}
-                        id={communityId ?? ""}
-                        question={
-                          "Tem certeza que deseja deletar esta comunidade?"
-                        }
-                      />
+                    <Avatar
+                      title={community?.name ?? ""}
+                      imageUrl={community?.avatarUrl}
+                      className="top h-40 w-36 shadow-lg rounded-xl"
+                    />
+                    {isUploadingAvatar && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-full">
+                        <span className="text-white text-xs font-bold">
+                          ...
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    ref={fileAvatarRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                  <div className="mt-4">
+                    <p className="text-xl md:text-2xl mb-2 font-bold">
+                      {community?.name}
+                    </p>
+                    <div className="flex flex-row gap-1">
+                      <CommunityIcon />
+                      <p className="text-sm md:text-base">
+                        {community?.members.length} membro(s)
+                      </p>
                     </div>
+                  </div>
+                </div>
+
+                <Activity mode={userIsOwnerOrModerator ? "visible" : "hidden"}>
+                  <div className="absolute top-4 right-4 z-20">
+                    <IconButton
+                      icon={<TrashIcon className="text-pink-600" />}
+                      onClick={() => setShowCommunityModal(!showCommunityModal)}
+                    />
+                    <ConfirmationModal
+                      isOpen={showCommunityModal}
+                      onClose={() => setShowCommunityModal(false)}
+                      onClick={handleDeleteCommunity}
+                      id={communityId ?? ""}
+                      question={
+                        "Tem certeza que deseja deletar esta comunidade?"
+                      }
+                    />
+                  </div>
+                </Activity>
+
+                <div className="flex flex-col items-end gap-2 ml-auto p-2">
+                  <Activity
+                    mode={
+                      userIsOwnerOrModerator && commuityIsPrivateOrSecret
+                        ? "visible"
+                        : "hidden"
+                    }
+                  >
+                    <CustomButton
+                      name={"add membro"}
+                      loading={false}
+                      className="w-30 md:w-40 rounded-xl border border-pink-600 px-4 py-2 text-sm font-medium text-white h-11 bg-pink-600"
+                      onClick={() => setShowAddMemberModal(true)}
+                    />
+                  </Activity>
+                  <Activity
+                    mode={
+                      !userIsCommunityMember &&
+                      communityVisibility === CommunityVisibility.PUBLIC
+                        ? "visible"
+                        : "hidden"
+                    }
+                  >
+                    <CustomButton
+                      name={"entrar"}
+                      loading={false}
+                      className="w-20 md:w-40 rounded-xl border border-pink-600 px-4 py-2 text-sm font-medium text-white bg-pink-600 transition h-11"
+                      onClick={() =>
+                        communityId
+                          ? addMemberOnTheCommunity(communityId, user?.id ?? "")
+                          : toast("Erro ao entrar na comunidade!")
+                      }
+                    />
                   </Activity>
 
-                  <div className="flex flex-col items-end gap-2 ml-auto p-2">
-                    <Activity
-                      mode={
-                        userIsOwnerOrModerator && commuityIsPrivateOrSecret
-                          ? "visible"
-                          : "hidden"
-                      }
-                    >
-                      <CustomButton
-                        name={"add membro"}
-                        loading={false}
-                        className="w-30 md:w-40 rounded-xl border border-pink-600 px-4 py-2 text-sm font-medium text-white h-11 bg-pink-600"
-                        onClick={() => setShowAddMemberModal(true)}
-                      />
-                    </Activity>
-                    <Activity
-                      mode={
-                        !userIsCommunityMember &&
-                        communityVisibility === CommunityVisibility.PUBLIC
-                          ? "visible"
-                          : "hidden"
-                      }
-                    >
-                      <CustomButton
-                        name={"entrar"}
-                        loading={false}
-                        className="w-20 md:w-40 rounded-xl border border-pink-600 px-4 py-2 text-sm font-medium text-white bg-pink-600 transition h-11"
-                        onClick={() =>
-                          communityId
-                            ? addMemberOnTheCommunity(
-                                communityId,
-                                user?.id ?? "",
-                              )
-                            : toast("Erro ao entrar na comunidade!")
-                        }
-                      />
-                    </Activity>
-
-                    <CustomButton
-                      onClick={() => setModalIsOpen(true)}
-                      loading={false}
-                      name="membros"
-                      className="w-20 md:w-40 rounded-xl border bg-white border-pink-600  text-sm font-medium text-pink-600 transition h-11 md:hidden"
-                    />
-                  </div>
+                  <CustomButton
+                    onClick={() => setModalIsOpen(true)}
+                    loading={false}
+                    name="membros"
+                    className="w-20 md:w-40 rounded-xl border bg-white border-pink-600  text-sm font-medium text-pink-600 transition h-11 md:hidden"
+                  />
                 </div>
               </div>
             </div>
-            <Activity mode={userIsCommunityMember ? "visible" : "hidden"}>
-              <PostSection
-                handleSubmit={handleSubmit}
-                onCreatePost={onCreatePost}
-                control={control}
-                user={user!}
-                textAreaRef={textAreaRef}
-                handleInput={handleInput}
-              />
-            </Activity>
-            <Activity mode={userIsCommunityMember ? "visible" : "hidden"}>
-              <div className="flex flex-col justify-center gap-4 w-full">
-                {posts?.map((post) => (
-                  <PostComponent
-                    key={post.id}
-                    userId={userId ?? ""}
-                    postId={post.id}
-                    content={post.content}
-                    authorProfilePicture={post.author?.profilePicture}
-                    authorName={post.author?.name}
-                    authorId={post.author?.id}
-                    postedAt={post.createdAt}
-                    fetchPostComments={fetchPostComments}
-                    onAddComment={createComment}
-                    communityId={communityId ?? ""}
-                    onCreateReaction={onCreateReaction}
-                    fetchReactions={fetchPostReactions}
-                    handleDeletePost={handleDeletePost}
-                    handleDeleteComment={handleDeleteComment}
-                  />
-                ))}
-              </div>
-            </Activity>
           </div>
-
-          <MembersSection
-            members={community?.members ?? []}
-            setModalIsOpen={setModalIsOpen}
-            communityDescription={community?.description}
-          />
+          <Activity mode={userIsCommunityMember ? "visible" : "hidden"}>
+            <PostSection
+              handleSubmit={handleSubmit}
+              onCreatePost={onCreatePost}
+              control={control}
+              user={user!}
+              textAreaRef={textAreaRef}
+              handleInput={handleInput}
+            />
+          </Activity>
+          <Activity mode={userIsCommunityMember ? "visible" : "hidden"}>
+            <div className="flex flex-col justify-center gap-4 w-full">
+              {posts?.map((post) => (
+                <PostComponent
+                  key={post.id}
+                  userId={userId ?? ""}
+                  postId={post.id}
+                  content={post.content}
+                  authorProfilePicture={post.author?.profilePicture}
+                  authorName={post.author?.name}
+                  authorId={post.author?.id}
+                  postedAt={post.createdAt}
+                  fetchPostComments={fetchPostComments}
+                  onAddComment={createComment}
+                  communityId={communityId ?? ""}
+                  onCreateReaction={onCreateReaction}
+                  fetchReactions={fetchPostReactions}
+                  handleDeletePost={handleDeletePost}
+                  handleDeleteComment={handleDeleteComment}
+                />
+              ))}
+            </div>
+          </Activity>
         </div>
-      </Suspense>
+
+        <MembersSection
+          members={community?.members ?? []}
+          setModalIsOpen={setModalIsOpen}
+          communityDescription={community?.description}
+        />
+      </div>
       <MemberModal
         isOpen={modalIsOpen}
         onClose={() => setModalIsOpen(false)}
