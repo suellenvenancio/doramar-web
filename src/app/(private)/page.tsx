@@ -1,7 +1,6 @@
 "use client"
 import { useCallback, useMemo, useState } from "react"
 
-import { CircleIcon } from "@/components/icons/circle"
 import { Layout } from "@/components/layout"
 import { CastModal } from "@/components/modal/castModal"
 import { CreateListModal } from "@/components/modal/createListModal"
@@ -10,6 +9,8 @@ import { TVShowItem } from "@/components/tvShowItem"
 import { useList } from "@/hooks/use-list"
 import { useTvShow } from "@/hooks/use-tv-shows"
 import { type TvShow } from "@/types"
+
+import Loading from "../loading"
 
 export default function HomePage() {
   const { tvShows, tvShowsByPage, fetchTvShowsByPage, isLoadingTvShowsByPage } =
@@ -69,7 +70,7 @@ export default function HomePage() {
       currentPage={currentPage}
     >
       {isLoadingTvShowsByPage ? (
-        <LoadingTvShows />
+        <Loading />
       ) : (
         <TVShowsList
           tvShowsToRender={tvShowsToRender}
@@ -79,15 +80,6 @@ export default function HomePage() {
         />
       )}
     </Layout>
-  )
-}
-
-function LoadingTvShows() {
-  return (
-    <div className="flex flex-col items-center justify-center w-full py-24">
-      <CircleIcon className="h-12 w-12 text-pink-600" />
-      <p className="mt-4 text-pink-600 font-medium">Carregando doramas...</p>
-    </div>
   )
 }
 
