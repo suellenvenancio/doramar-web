@@ -2,8 +2,8 @@
 import { useRouter } from "next/navigation"
 import { Activity, useState } from "react"
 
+import Loading from "@/app/loading"
 import { Avatar } from "@/components/avatar"
-import { CircleIcon } from "@/components/icons/circle"
 import { Layout } from "@/components/layout"
 import { CreateCommunityModal } from "@/components/modal/createCommunityModal"
 import { useCommunities } from "@/hooks/use-communities"
@@ -49,11 +49,7 @@ export default function CommunitiesPage() {
           </button>
         </div>
 
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center w-full py-24">
-            <CircleIcon className="h-12 w-12 text-pink-600" />
-          </div>
-        )}
+        {isLoading && <Loading />}
         {communities?.length > 0 ? (
           <div className="flex flex-col md:flex-row items-center justify-center md:gap-6 md:flex-wrap md:justify-start">
             {communities.map((community) => (

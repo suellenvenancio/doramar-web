@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback, useState } from "react"
 import useSWR from "swr"
 
@@ -25,7 +27,6 @@ export function useTvShow() {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       dedupingInterval: 60 * 60 * 1000,
-      suspense: true,
     },
   )
 
@@ -36,7 +37,6 @@ export function useTvShow() {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       dedupingInterval: 60 * 60 * 1000,
-      suspense: true,
     },
   )
 
@@ -47,7 +47,6 @@ export function useTvShow() {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       dedupingInterval: 60 * 60 * 1000,
-      suspense: true,
     },
   )
 
@@ -58,7 +57,6 @@ export function useTvShow() {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       dedupingInterval: 60 * 60 * 1000,
-      suspense: true,
     },
   )
 

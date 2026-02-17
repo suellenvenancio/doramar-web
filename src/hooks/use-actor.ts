@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback } from "react"
 import useSWR from "swr"
 
@@ -27,7 +29,6 @@ export function useActor() {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       dedupingInterval: 60 * 60 * 1000,
-      suspense: true,
     },
   )
 

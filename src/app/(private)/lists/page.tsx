@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
+import Loading from "@/app/loading"
 import { IconButton } from "@/components/button/iconButton"
-import { CircleIcon } from "@/components/icons/circle"
 import { TrashIcon } from "@/components/icons/trash"
 import { Layout } from "@/components/layout"
 import { ConfirmationModal } from "@/components/modal/confirmationModal"
@@ -52,11 +52,7 @@ export default function ListsPage() {
             Nova lista
           </button>
         </div>
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center w-full py-24">
-            <CircleIcon className="h-12 w-12 text-pink-600" />
-          </div>
-        )}
+        {isLoading && <Loading />}
 
         {lists.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">

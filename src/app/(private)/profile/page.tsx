@@ -1,6 +1,5 @@
-import { Suspense } from "react"
+"use client"
 
-import Loading from "@/app/loading"
 import Profile from "@/components/profile"
 import { useActor } from "@/hooks/use-actor"
 import { useList } from "@/hooks/use-list"
@@ -16,17 +15,15 @@ export default function MyProfilePage() {
   const { favoriteActors } = useActor()
 
   return (
-    <Suspense fallback={<Loading />}>
-      <Profile
-        user={user!}
-        watchedTvShows={watchedTvShows}
-        ratings={ratings}
-        lists={lists ?? []}
-        favoriteTvShow={favoriteTvShow}
-        favoriteActors={favoriteActors ?? []}
-        createRating={createRating}
-        uploadProfilePicture={uploadProfilePicture}
-      />
-    </Suspense>
+    <Profile
+      user={user!}
+      watchedTvShows={watchedTvShows}
+      ratings={ratings}
+      lists={lists ?? []}
+      favoriteTvShow={favoriteTvShow}
+      favoriteActors={favoriteActors ?? []}
+      createRating={createRating}
+      uploadProfilePicture={uploadProfilePicture}
+    />
   )
 }

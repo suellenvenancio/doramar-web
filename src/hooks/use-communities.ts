@@ -1,3 +1,5 @@
+"use client"
+
 import useSWR from "swr"
 
 import { toast } from "@/components/toast"
@@ -17,7 +19,6 @@ export function useCommunities() {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       dedupingInterval: 60 * 60 * 1000,
-      suspense: true,
     },
   )
 

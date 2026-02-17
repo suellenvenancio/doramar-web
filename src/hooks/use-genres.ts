@@ -1,3 +1,5 @@
+"use client"
+
 import useSWR from "swr"
 
 import { genreService } from "@/services/genres.service"
@@ -8,7 +10,6 @@ export function useGenres() {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     dedupingInterval: 60 * 60 * 1000,
-    suspense: true,
   })
 
   return {
