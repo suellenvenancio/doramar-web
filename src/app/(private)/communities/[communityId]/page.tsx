@@ -3,8 +3,21 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
-import { Controller, useForm } from "react-hook-form"
+import {
+  Activity,
+  ChangeEvent,
+  RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
+import {
+  Control,
+  Controller,
+  useForm,
+  UseFormHandleSubmit,
+} from "react-hook-form"
 import z from "zod"
 
 import { Avatar } from "@/components/avatar"
@@ -26,9 +39,11 @@ import { useUser } from "@/hooks/use-user"
 import {
   CommunityRole,
   CommunityVisibility,
+  Member,
   type Post,
   type ReactionTargetType,
   type ReactionType,
+  User,
 } from "@/types"
 
 const createPostSchema = z.object({
@@ -353,7 +368,8 @@ export default function CommunityDetails() {
                     </div>
                   </div>
                 </div>
-                {userIsOwnerOrModerator && (
+
+                <Activity mode={userIsOwnerOrModerator ? "visible" : "hidden"}>
                   <div className="absolute top-4 right-4 z-20">
                     <IconButton
                       icon={<TrashIcon className="text-pink-600" />}
@@ -369,34 +385,42 @@ export default function CommunityDetails() {
                       }
                     />
                   </div>
-                )}
+                </Activity>
 
                 <div className="flex flex-col items-end gap-2 ml-auto p-2">
-                  {userIsOwnerOrModerator && commuityIsPrivateOrSecret && (
+                  <Activity
+                    mode={
+                      userIsOwnerOrModerator && commuityIsPrivateOrSecret
+                        ? "visible"
+                        : "hidden"
+                    }
+                  >
                     <CustomButton
                       name={"add membro"}
                       loading={false}
                       className="w-30 md:w-40 rounded-xl border border-pink-600 px-4 py-2 text-sm font-medium text-white h-11 bg-pink-600"
                       onClick={() => setShowAddMemberModal(true)}
                     />
-                  )}
-
-                  {!userIsCommunityMember &&
-                    communityVisibility === CommunityVisibility.PUBLIC && (
-                      <CustomButton
-                        name={"entrar"}
-                        loading={false}
-                        className="w-20 md:w-40 rounded-xl border border-pink-600 px-4 py-2 text-sm font-medium text-white bg-pink-600 transition h-11"
-                        onClick={() =>
-                          communityId
-                            ? addMemberOnTheCommunity(
-                                communityId,
-                                user?.id ?? "",
-                              )
-                            : toast("Erro ao entrar na comunidade!")
-                        }
-                      />
-                    )}
+                  </Activity>
+                  <Activity
+                    mode={
+                      !userIsCommunityMember &&
+                      communityVisibility === CommunityVisibility.PUBLIC
+                        ? "visible"
+                        : "hidden"
+                    }
+                  >
+                    <CustomButton
+                      name={"entrar"}
+                      loading={false}
+                      className="w-20 md:w-40 rounded-xl border border-pink-600 px-4 py-2 text-sm font-medium text-white bg-pink-600 transition h-11"
+                      onClick={() =>
+                        communityId
+                          ? addMemberOnTheCommunity(communityId, user?.id ?? "")
+                          : toast("Erro ao entrar na comunidade!")
+                      }
+                    />
+                  </Activity>
 
                   <CustomButton
                     onClick={() => setModalIsOpen(true)}
@@ -408,49 +432,17 @@ export default function CommunityDetails() {
               </div>
             </div>
           </div>
-
-          {userIsCommunityMember && (
-            <form
-              className="flex flex-row gap-4 items-start bg-white p-4 rounded-2xl shadow-sm w-full"
-              onSubmit={handleSubmit(onCreatePost)}
-            >
-              <Avatar
-                imageUrl={user?.profilePicture}
-                title={user?.name ?? ""}
-                className="rounded-full bg-violet-300 w-16 h-16 flex-shrink-0"
-              />
-              <div className="flex-1 flex flex-col items-end gap-2 w-full ">
-                <Controller
-                  render={({ field }) => (
-                    <textarea
-                      {...field}
-                      ref={(e) => {
-                        field.ref(e)
-                        textAreaRef.current = e
-                      }}
-                      onInput={() => {
-                        handleInput()
-                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                        field.onChange
-                      }}
-                      rows={1}
-                      name="content"
-                      className="w-full resize-none overflow-hidden border border-pink-500 rounded-lg p-3 focus:ring-2 outline-none text-base min-h-[45px]"
-                    />
-                  )}
-                  name="content"
-                  control={control}
-                />
-
-                <CustomButton
-                  name="postar"
-                  loading={false}
-                  className="w-24 h-10 rounded-xl"
-                />
-              </div>
-            </form>
-          )}
-          {userIsCommunityMember && (
+          <Activity mode={userIsCommunityMember ? "visible" : "hidden"}>
+            <PostSection
+              handleSubmit={handleSubmit}
+              onCreatePost={onCreatePost}
+              control={control}
+              user={user!}
+              textAreaRef={textAreaRef}
+              handleInput={handleInput}
+            />
+          </Activity>
+          <Activity mode={userIsCommunityMember ? "visible" : "hidden"}>
             <div className="flex flex-col justify-center gap-4 w-full">
               {posts?.map((post) => (
                 <PostComponent
@@ -472,42 +464,14 @@ export default function CommunityDetails() {
                 />
               ))}
             </div>
-          )}
+          </Activity>
         </div>
 
-        <aside className="hidden col-span-1 md:flex md:flex-col gap-4 sticky top-6 ">
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <SessionTitle
-              title="Membros"
-              icon={<CommunityIcon className="text-pink-600" />}
-            />
-            <div className="grid grid-cols-4 gap-2">
-              {community?.members?.slice(0, 8).map((member) => (
-                <Members
-                  key={member.id}
-                  id={member.user.id}
-                  name={member.user.name}
-                  profilePicture={member.user.profilePicture}
-                />
-              ))}
-            </div>
-
-            {community?.members && community.members.length > 8 && (
-              <TextButton
-                name={`Ver todos (${community.members.length})`}
-                className="no-underline"
-                onClick={() => setModalIsOpen(true)}
-              />
-            )}
-          </div>
-
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <SessionTitle title="Descrição" />
-            <p className="mt-2 text-sm text-gray-600">
-              {community?.description || "Sem descrição disponível."}
-            </p>
-          </div>
-        </aside>
+        <MembersSection
+          members={community?.members ?? []}
+          setModalIsOpen={setModalIsOpen}
+          communityDescription={community?.description}
+        />
       </div>
       <MemberModal
         isOpen={modalIsOpen}
@@ -521,5 +485,125 @@ export default function CommunityDetails() {
         onSearchMember={onSearchMember}
       />
     </Layout>
+  )
+}
+
+function MembersSection({
+  members,
+  setModalIsOpen,
+  communityDescription,
+}: {
+  members: Member[]
+  setModalIsOpen: (isOpen: boolean) => void
+  communityDescription?: string
+}) {
+  return (
+    <aside className="hidden col-span-1 md:flex md:flex-col gap-4 sticky top-6 ">
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <SessionTitle
+          title="Membros"
+          icon={<CommunityIcon className="text-pink-600" />}
+        />
+        <div className="grid grid-cols-4 gap-2">
+          {members?.slice(0, 8).map((member) => (
+            <Members
+              key={member.id}
+              id={member.user.id}
+              name={member.user.name}
+              profilePicture={member.user.profilePicture}
+            />
+          ))}
+        </div>
+
+        {members.length > 8 && (
+          <TextButton
+            name={`Ver todos (${members.length})`}
+            className="no-underline"
+            onClick={() => setModalIsOpen(true)}
+          />
+        )}
+      </div>
+
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <SessionTitle title="Descrição" />
+        <p className="mt-2 text-sm text-gray-600">
+          {communityDescription || "Sem descrição disponível."}
+        </p>
+      </div>
+    </aside>
+  )
+}
+
+function PostSection({
+  handleSubmit,
+  onCreatePost,
+  control,
+  user,
+  textAreaRef,
+  handleInput,
+}: {
+  handleSubmit: UseFormHandleSubmit<
+    {
+      content: string
+    },
+    {
+      content: string
+    }
+  >
+  onCreatePost: (formData: FormData) => void
+  control: Control<
+    {
+      content: string
+    },
+    {
+      content: string
+    }
+  >
+  user: User
+  textAreaRef: RefObject<HTMLTextAreaElement | null>
+  handleInput: () => void
+}) {
+  return (
+    <form
+      className="flex flex-row gap-4 items-start bg-white p-4 rounded-2xl shadow-sm w-full"
+      onSubmit={handleSubmit(onCreatePost)}
+    >
+      <Avatar
+        imageUrl={user?.profilePicture}
+        title={user?.name ?? ""}
+        className="rounded-full bg-violet-300 w-16 h-16 flex-shrink-0"
+      />
+      <div className="flex-1 flex flex-col items-end gap-2 w-full ">
+        <Controller
+          render={({ field }) => (
+            <textarea
+              {...field}
+              ref={(e) => {
+                field.ref(e)
+                if (textAreaRef) {
+                  textAreaRef.current = e
+                }
+              }}
+              onInput={() => {
+                handleInput()
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                field.onChange
+              }}
+              rows={1}
+              name="content"
+              className="w-full resize-none overflow-hidden border border-pink-500 rounded-lg p-3 focus:ring-2 outline-none text-base min-h-[45px]"
+            />
+          )}
+          name="content"
+          control={control}
+        />
+
+        <CustomButton
+          name="postar"
+          loading={false}
+          className="w-24 h-10 rounded-xl"
+        />
+      </div>
+    </form>
   )
 }

@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
+import Loading from "@/app/loading"
 import { IconButton } from "@/components/button/iconButton"
-import { CircleIcon } from "@/components/icons/circle"
 import { TrashIcon } from "@/components/icons/trash"
 import { Layout } from "@/components/layout"
 import { ConfirmationModal } from "@/components/modal/confirmationModal"
@@ -34,29 +34,25 @@ export default function ListsPage() {
         <div className="mb-6 flex items-center justify-center">
           <button
             className="
-              flex items-center gap-2
-              rounded-full
-              bg-[#F2A7C6]
-              px-5 py-2
-              text-sm font-semibold text-white
-              shadow
-              hover:bg-[#EC8FB4]
-              transition
-              mt-4
-              ml-4
-              md:mr-0
-            "
+            flex items-center gap-2
+            rounded-full
+            bg-[#F2A7C6]
+            px-5 py-2
+            text-sm font-semibold text-white
+            shadow
+            hover:bg-[#EC8FB4]
+            transition
+            mt-4
+            ml-4
+            md:mr-0
+          "
             onClick={() => setShowCreateListModal(true)}
           >
             <span className="text-lg leading-none">+</span>
             Nova lista
           </button>
         </div>
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center w-full py-24">
-            <CircleIcon className="h-12 w-12 text-pink-600" />
-          </div>
-        )}
+        {isLoading && <Loading />}
 
         {lists.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">

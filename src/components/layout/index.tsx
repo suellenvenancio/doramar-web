@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react"
 
-import { ButtonTypeEnum, type Genre, type Page } from "@/types"
+import { type Page } from "@/types"
 import { mergeCn } from "@/utils/cn"
 
 import { Header } from "../header"
@@ -14,11 +14,8 @@ interface LayoutProps {
   headerProps?: {
     search: string
     setSearch: (value: string) => void
-    activePopup: ButtonTypeEnum | null
-    genres: Genre[]
     selectedGenres: string[]
     onSelectGenre: (genreId: string) => void
-    setActivePopUp: () => void
     page: Page
   }
   currentPage?: number

@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback, useState } from "react"
 import useSWR from "swr"
 
@@ -18,23 +20,44 @@ export function useTvShow() {
     tvShowService.getAllTvShows(),
   )
 
-  const { data: watchedStatus } = useSWR("watchedStatus", () =>
-    tvShowService.getWatchedStatus(),
+  const { data: watchedStatus } = useSWR(
+    "watchedStatus",
+    () => tvShowService.getWatchedStatus(),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60 * 60 * 1000,
+    },
   )
 
   const { data: watchedTvShows, mutate: mutateWatchedTvShows } = useSWR(
-    "watchedTvShows",
-    () => tvShowService.getWatchedTvShowsByUserId(userId || ""),
+    userId ? ["watchedTvShows", userId] : null,
+    () => tvShowService.getWatchedTvShowsByUserId(userId!),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60 * 60 * 1000,
+    },
   )
 
   const { data: favoriteTvShow, mutate: mutateFavoriteTvShow } = useSWR<TvShow>(
-    "favoriteTvShow",
-    () => tvShowService.findFavoriteTvShowByUserId(userId || ""),
+    userId ? ["favoriteTvShow", userId] : null,
+    () => tvShowService.findFavoriteTvShowByUserId(userId!),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60 * 60 * 1000,
+    },
   )
 
   const { data: tvShowsByPage, isLoading: isLoadingTvShowsByPage } = useSWR(
     ["tvShowsByPage", page, limit],
     () => tvShowService.getTvShowsByPage(page, limit),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60 * 60 * 1000,
+    },
   )
 
   const markTvShowAsWatched = useCallback(

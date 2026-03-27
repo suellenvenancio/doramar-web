@@ -1,9 +1,9 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { Activity, useState } from "react"
 
+import Loading from "@/app/loading"
 import { Avatar } from "@/components/avatar"
-import { CircleIcon } from "@/components/icons/circle"
 import { Layout } from "@/components/layout"
 import { CreateCommunityModal } from "@/components/modal/createCommunityModal"
 import { useCommunities } from "@/hooks/use-communities"
@@ -30,18 +30,18 @@ export default function CommunitiesPage() {
         >
           <button
             className="
-              flex items-center gap-2
-              rounded-full
-              bg-[#F2A7C6]
-              px-5 py-2
-              text-sm font-semibold text-white
-              shadow
-              hover:bg-[#EC8FB4]
-              transition
-              mt-4
-              ml-4
-              md:mr-0
-            "
+            flex items-center gap-2
+            rounded-full
+            bg-[#F2A7C6]
+            px-5 py-2
+            text-sm font-semibold text-white
+            shadow
+            hover:bg-[#EC8FB4]
+            transition
+            mt-4
+            ml-4
+            md:mr-0
+          "
             onClick={() => setShowCreateCommunityModal(true)}
           >
             <span className="text-lg leading-none">+</span>
@@ -49,12 +49,7 @@ export default function CommunitiesPage() {
           </button>
         </div>
 
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center w-full py-24">
-            <CircleIcon className="h-12 w-12 text-pink-600" />
-          </div>
-        )}
-
+        {isLoading && <Loading />}
         {communities?.length > 0 ? (
           <div className="flex flex-col md:flex-row items-center justify-center md:gap-6 md:flex-wrap md:justify-start">
             {communities.map((community) => (
@@ -80,14 +75,14 @@ export default function CommunitiesPage() {
             </p>
           </div>
         )}
-        {showCreateCommunityModal && (
+        <Activity mode={showCreateCommunityModal ? "visible" : "hidden"}>
           <CreateCommunityModal
             onClose={() => {
               setShowCreateCommunityModal(false)
             }}
             onCreate={createCommunity}
           />
-        )}
+        </Activity>
       </div>
     </Layout>
   )

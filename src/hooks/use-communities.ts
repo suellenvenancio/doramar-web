@@ -1,3 +1,5 @@
+"use client"
+
 import useSWR from "swr"
 
 import { toast } from "@/components/toast"
@@ -10,8 +12,14 @@ export function useCommunities() {
   const { user } = useUser()
   const userId = user?.id
 
-  const { data, mutate, isLoading } = useSWR<Community[]>("communities", () =>
-    communitiesService.getAllCommunities(),
+  const { data, mutate, isLoading } = useSWR<Community[]>(
+    "communities",
+    () => communitiesService.getAllCommunities(),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60 * 60 * 1000,
+    },
   )
 
   const createCommunity = async ({

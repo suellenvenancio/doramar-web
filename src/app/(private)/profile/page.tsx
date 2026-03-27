@@ -1,4 +1,5 @@
 "use client"
+
 import Profile from "@/components/profile"
 import { useActor } from "@/hooks/use-actor"
 import { useList } from "@/hooks/use-list"

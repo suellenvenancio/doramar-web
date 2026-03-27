@@ -1,24 +1,21 @@
+import { useActor } from "@/hooks/use-actor"
+
 import type { Actor } from "../../types"
 import { Avatar } from "../avatar"
 import { IconButton } from "../button/iconButton"
 import { HeartIcon } from "../icons/heart"
 
 interface CastModalProps {
-  isOpen: boolean
   onClose: () => void
   actors: Actor[]
-  onClick: (actor: Actor) => void
-  favoriteActors: Actor[]
 }
 
-export function CastModal({
-  isOpen,
-  onClose,
-  actors,
-  onClick,
-  favoriteActors,
-}: CastModalProps) {
-  if (!isOpen) return null
+export function CastModal({ onClose, actors }: CastModalProps) {
+  const { markActorAsFavorite, favoriteActors } = useActor()
+
+  const handleMakeActorFavorite = async (actor: Actor) => {
+    await markActorAsFavorite(actor.id)
+  }
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex justify-center items-center p-4">
@@ -62,7 +59,7 @@ export function CastModal({
                       }`}
                     />
                   }
-                  onClick={() => onClick(actor)}
+                  onClick={() => handleMakeActorFavorite(actor)}
                 />
               </div>
             )

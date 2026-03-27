@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback } from "react"
 import useSWR from "swr"
 
@@ -20,8 +22,14 @@ export function useActor() {
     }
   }, [])
 
-  const { data, mutate } = useSWR<Actor[]>("actors", () =>
-    findFavoriteActorsByUserId(userId ?? ""),
+  const { data, mutate } = useSWR<Actor[]>(
+    userId ? ["actors", userId] : null,
+    () => findFavoriteActorsByUserId(userId!),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60 * 60 * 1000,
+    },
   )
 
   const markActorAsFavorite = useCallback(
@@ -49,7 +57,7 @@ export function useActor() {
 
   return {
     markActorAsFavorite,
-    favoriteActors: data,
+    favoriteActors: data || [],
     findFavoriteActorsByUserId,
   }
 }
