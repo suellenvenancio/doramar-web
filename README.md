@@ -1,74 +1,70 @@
-# React + TypeScript + Vite
+# Doramar Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é o frontend da aplicação Doramar, construído com as tecnologias mais modernas do ecossistema React. Utilizamos Next.js para garantir performance, juntamente com o Tailwind CSS para uma estilização rápida e responsiva. O projeto também possui autenticação integrada via Firebase e utiliza bibliotecas robustas para gerenciamento de estado, arrastar e soltar (drag & drop), validação de formulários e testes.
 
-Currently, two official plugins are available:
+## 🚀 Tecnologias e Ferramentas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+As principais bibliotecas e ferramentas utilizadas no projeto são:
 
-## React Compiler
+- **Framework Core**: [Next.js](https://nextjs.org/) (Versão 16+) / [React](https://react.dev/) (Versão 19+)
+- **Estilização**: [Tailwind CSS](https://tailwindcss.com/)
+- **Autenticação**: [Firebase Auth](https://firebase.google.com/docs/auth)
+- **Manipulação de Dados (Fetch)**: [Axios](https://github.com/axios/axios) e [SWR](https://swr.vercel.app/)
+- **Formulários e Validação**: [React Hook Form](https://react-hook-form.com/) e [Zod](https://zod.dev/)
+- **Interação (Drag and Drop)**: [@dnd-kit](https://dndkit.com/)
+- **Testes**: [Jest](https://jestjs.io/) e [React Testing Library](https://testing-library.com/)
+- **Padronização de Código**: ESLint, Prettier e TypeScript
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📦 Estrutura do Projeto
 
-## Expanding the ESLint configuration
+O projeto utiliza a estrutura do App Router do Next.js (`src/app`). As pastas principais incluem:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `/src/app`: Onde residem as rotas (ex: `/(public)/login`, `/(public)/create-account`)
+- `/src/components`: Componentes reutilizáveis de interface
+- `/src/context`: Gerenciadores de estado globais e contexto provedores (ex: `AuthProvider`)
+- `/src/assets`: Imagens e arquivos estáticos
+- `/tests`: Configurações e arquivos para os testes unitários e de integração com Jest
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠️ Como Executar Localmente
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Pré-requisitos
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js (Versão recomendada: 20+)
+- Gerenciador de pacotes NPM (ou Yarn/Pnpm/Bun de acordo com a sua preferência)
+
+### Passo a Passo
+
+1. Após clonar ou baixar os arquivos deste repositório, instale as dependências:
+
+   ```bash
+   npm install
+   ```
+
+2. Crie ou configure um arquivo `.env` na raiz do projeto com base nas chaves do Firebase e em outras variáveis de ambiente necessárias para a API e Autenticação.
+
+3. Inicie o servidor de desenvolvimento:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Acesse em seu navegador a porta padrão informada pelo Next.js.
+
+## 🧪 Como Executar os Testes
+
+O projeto utiliza Jest como seu ambiente de testes padrão. Você pode rodá-los com o seguinte comando:
+
+```bash
+# Rodar todos os testes de uma vez
+npm run test
+
+# Rodar os testes em modo escuta (watch)
+npm run test:watch
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ✨ Funcionalidades Principais
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-# doramar-web
+- **Sistema de Contas**: Login e criação de contas via Firebase Auth.
+- **Componentes Drag & Drop**: Uso do dnd-kit na interface.
+- **Proteção de Rotas**: Controle de fluxo de acesso nas pastas (públicas e privadas).
+- **Feedback ao Usuário**: Notificações Toast interativas (react-toastify).
